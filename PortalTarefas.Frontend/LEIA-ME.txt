@@ -1,0 +1,18 @@
+FRONT-END COM LOGIN (Relatorio 6)
+
+Esta pasta SUBSTITUI o front-end do Relatorio 5 (mesmo projeto, agora com login e rotas protegidas).
+
+1) Extraia o zip e abra a pasta PortalTarefas.Frontend no VS Code.
+2) Terminal (Ctrl + '):
+      npm install
+      npm run dev
+3) A API do Relatorio 6 precisa estar rodando em outro terminal (veja o LEIA-ME dela):
+      dotnet run --launch-profile http
+4) Abra http://localhost:5173  (vai redirecionar para /login)
+   - usuario@portal.local  (papel Usuario): ve a lista e "Nova tarefa"; NAO ve "Excluir"
+   - admin@portal.local    (papel Administrador): ve "Excluir" no detalhe da tarefa
+   A senha e a que voce definiu no user-secrets da API.
+5) Teste de URL pretendida: com a sessao encerrada, abra http://localhost:5173/tarefas/2; apos o login, volta para essa URL.
+6) Build de producao:  npm run build
+
+Prints sugeridos: tela de login com erro ("E-mail ou senha inválidos."), lista logada como usuario (sem Excluir), detalhe como admin (com Excluir). Cubra seu usuario do Windows.

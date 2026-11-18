@@ -1,0 +1,14 @@
+{
+  "name": "portal-tarefas-cliente",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "gerar": "nswag run nswag.json",
+    "uso": "tsx uso.ts"
+  },
+  "devDependencies": {
+    "nswag": "^14.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  }
+}

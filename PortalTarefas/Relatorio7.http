@@ -1,0 +1,43 @@
+@host = http://localhost:5001
+# Mesma senha do user-secrets (nao compartilhe este arquivo preenchido)
+@senha = COLE_A_SENHA_AQUI
+
+### 1) LIVENESS: so indica que o processo responde (200)
+GET {{host}}/health/live
+
+### 2) READINESS com banco e dependencia saudaveis (200)
+GET {{host}}/health/ready
+
+### 3) Login do usuario (204)
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "email": "usuario@portal.local", "senha": "{{senha}}" }
+
+### 4) Chamada a dependencia saudavel (200)
+GET {{host}}/api/diagnostico/dependencia
+
+### 5) SIMULAR INDISPONIBILIDADE da dependencia (204)
+POST {{host}}/sim/dependencia/desligar
+
+### 6) READINESS agora falha (503), mas o LIVENESS continua 200
+GET {{host}}/health/ready
+
+### 6b) LIVENESS (200)
+GET {{host}}/health/live
+
+### 7) RETRY e CIRCUIT BREAKER: rode este item 4 a 6 vezes seguidas.
+### Primeiro: 502 (demora, ha tentativas). Depois: 503 imediato (circuito aberto).
+GET {{host}}/api/diagnostico/dependencia
+
+### 8) RELIGAR a dependencia (204). Espere 15 segundos (circuito fecha) e repita 6) e 4).
+POST {{host}}/sim/dependencia/ligar
+
+### 9) OUTPUT CACHE: rode 2 vezes seguidas; o campo geradoEm NAO muda (cache por 30 s)
+GET {{host}}/api/publico/resumo
+
+### 10) Criar tarefa invalida o cache (201). Depois rode o item 9: geradoEm muda
+POST {{host}}/api/tarefas
+Content-Type: application/json
+
+{ "titulo": "Tarefa para invalidar o cache", "descricao": "teste" }

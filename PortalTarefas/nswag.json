@@ -1,0 +1,15 @@
+{
+  "runtime": "Default",
+  "documentGenerator": {
+    "fromDocument": {
+      "json": "openapi/v1.json"
+    }
+  },
+  "codeGenerators": {
+    "openApiToTypeScriptClient": {
+      "template": "Fetch",
+      "className": "{controller}Client",
+      "output": "client/tarefasClient.ts"
+    }
+  }
+}

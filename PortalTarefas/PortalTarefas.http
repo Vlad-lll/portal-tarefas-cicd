@@ -1,0 +1,60 @@
+@host = http://localhost:5001
+# Digite aqui a senha que voce definiu no user-secrets (NAO envie este arquivo preenchido a ninguem)
+@senha = COLE_A_SENHA_AQUI
+
+### A) ANONIMO: lista sem login (401)
+GET {{host}}/api/tarefas
+
+### B) Login invalido (401, mesma mensagem para e-mail inexistente ou senha errada)
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "email": "naoexiste@portal.local", "senha": "errada" }
+
+### C) Login do USUARIO comum (204, guarda o cookie)
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "email": "usuario@portal.local", "senha": "{{senha}}" }
+
+### D) Sessao atual (200 com papeis)
+GET {{host}}/api/auth/me
+
+### E) USUARIO lista (200)
+GET {{host}}/api/tarefas
+
+### F) USUARIO cria (201)
+POST {{host}}/api/tarefas
+Content-Type: application/json
+
+{ "titulo": "Tarefa criada pelo usuario", "descricao": "teste" }
+
+### G) USUARIO tenta editar (403)
+PUT {{host}}/api/tarefas/1
+Content-Type: application/json
+
+{ "titulo": "Tentativa", "concluida": true, "rowVersion": "AAAAAAAAB9E=" }
+
+### H) USUARIO tenta excluir (403)
+DELETE {{host}}/api/tarefas/1
+
+### I) Logout (204)
+POST {{host}}/api/auth/logout
+
+### J) Depois do logout, sessao some (401)
+GET {{host}}/api/auth/me
+
+### K) Login do ADMINISTRADOR (204)
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "email": "admin@portal.local", "senha": "{{senha}}" }
+
+### L) ADMIN exclui (204): troque o 12 por um id que exista
+DELETE {{host}}/api/tarefas/12
+
+### M) ADMIN edita (200): primeiro faca GET /api/tarefas/1 e copie o rowVersion
+PUT {{host}}/api/tarefas/1
+Content-Type: application/json
+
+{ "titulo": "Tarefa de exemplo 1", "concluida": true, "rowVersion": "COLE_O_ROWVERSION" }

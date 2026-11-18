@@ -1,0 +1,33 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with: { dotnet-version: 10.0.x }
+      - run: dotnet restore PortalTarefas.Tests
+      - run: dotnet restore PortalTarefas
+      - run: dotnet build PortalTarefas -c Release --no-restore
+      - run: dotnet test PortalTarefas.Tests -c Release
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: PortalTarefas.Frontend/package-lock.json
+      - run: npm ci && npm run build
+        working-directory: PortalTarefas.Frontend
+      - run: docker build -t portal-tarefas:${{ github.sha }} .
+      - run: |
+          docker save portal-tarefas:${{ github.sha }} \
+            | gzip > portal-tarefas-${{ github.sha }}.tar.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: portal-tarefas-${{ github.sha }}
+          path: portal-tarefas-${{ github.sha }}.tar.gz

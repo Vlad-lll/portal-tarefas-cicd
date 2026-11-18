@@ -1,0 +1,33 @@
+API COM IDENTITY (Relatorio 6: Desenvolvimento Web com .NET)
+
+Esta pasta SUBSTITUI a API do Relatorio 4. Ela usa um banco novo (PortalTarefasSeg), entao nao mexe no antigo.
+
+1) EXTRAIR
+   Extraia o zip. Vai surgir a pasta PortalTarefas (com PortalTarefas.csproj dentro).
+   Abra essa pasta no VS Code.
+
+2) DEFINIR A SENHA DOS USUARIOS DE TESTE (fica so no seu computador, nao vai para o codigo)
+   No terminal, dentro da pasta PortalTarefas:
+      dotnet user-secrets set "Seed:Senha" "Escolha@Uma123Senha"
+   A senha precisa ter 8+ caracteres, com maiuscula, minuscula, numero e simbolo.
+   Usuarios criados: usuario@portal.local (papel Usuario) e admin@portal.local (papel Administrador).
+
+3) CRIAR A MIGRATION (so na primeira vez)
+      dotnet tool install --global dotnet-ef
+      dotnet ef migrations add Inicial
+   (se o dotnet-ef ja estiver instalado, o primeiro comando avisa; siga para o segundo)
+
+4) RODAR
+      dotnet run --launch-profile http
+   Ele cria o banco, as tarefas de exemplo, as roles e os dois usuarios. Espere "Now listening on: http://localhost:5001".
+
+5) TESTAR COM O ARQUIVO PortalTarefas.http (extensao REST Client no VS Code)
+   - Troque COLE_A_SENHA_AQUI pela senha do passo 2.
+   - Rode os itens em ordem (A ate M), clicando em "Send Request".
+   - Resultados esperados: A=401, B=401, C=204, D=200, E=200, F=201, G=403, H=403, I=204, J=401, K=204, L=204, M=200.
+
+6) PRINTS (Win + Shift + S)
+   - 401: item A (anonimo) e item J (depois do logout).
+   - 403: itens G e H (usuario comum).
+   - Logout: itens I e J em sequencia.
+   - Cubra qualquer cookie, senha ou usuario do Windows que aparecer no print.

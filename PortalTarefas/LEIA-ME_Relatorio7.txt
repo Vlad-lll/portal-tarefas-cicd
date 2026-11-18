@@ -1,0 +1,24 @@
+OBSERVABILIDADE E RESILIENCIA (Relatorio 7: Desenvolvimento Web com .NET)
+
+Este zip traz SO os arquivos que mudam. Copie por cima da sua pasta PortalTarefas (a API do Relatorio 6),
+substituindo: Program.cs, PortalTarefas.csproj, appsettings.json. Os outros arquivos entram sem substituir nada.
+NAO apague a pasta Migrations nem o user-secrets: eles continuam valendo (a senha do seed e a mesma).
+
+1) Pare a API (Ctrl+C no terminal dela).
+2) Copie os arquivos (Program.cs, PortalTarefas.csproj, appsettings.json, Relatorio7.http) para dentro da pasta PortalTarefas.
+3) No terminal, dentro da PortalTarefas:
+      dotnet run --launch-profile http
+   (ele baixa os pacotes novos na primeira vez). Espere "Now listening on: http://localhost:5001".
+   Os logs agora saem em JSON, com CorrelationId. Tambem aparecem traces e metricas do OpenTelemetry.
+4) Abra Relatorio7.http, troque COLE_A_SENHA_AQUI pela senha do seed e rode os itens em ordem:
+   1=200  2=200  3=204  4=200  5=204  6=503 (readiness) e 6b=200 (liveness)
+   7 (repita 4 a 6 vezes)=502 e depois 503  8=204 (espere 15 s)  9 (2 vezes, geradoEm igual)=200  10=201  9=200 (geradoEm novo)
+5) RATE LIMITING (429): em um terminal PowerShell qualquer, rode:
+   1..30 | ForEach-Object { try { (Invoke-WebRequest "http://localhost:5001/api/tarefas" -UseBasicParsing).StatusCode } catch { [int]$_.Exception.Response.StatusCode } }
+   Aparecem varios 401 (sem login) e, depois da 20a chamada em 10 s, 429. Com login (cookie) o resultado seria 200 e depois 429.
+6) PRINTS (Win + Shift + S), no maximo 3:
+   a) Terminal da API com logs JSON mostrando o mesmo CorrelationId (e o X-Correlation-Id na resposta do .http).
+   b) Item 2 (200) e item 6 (503) lado a lado, ou readiness 503 + liveness 200.
+   c) A saida do loop com o 429 (ou um item com 429 no .http).
+   Nao apareca cookie, senha nem usuario do Windows.
+7) Limite didatico: o teste e local. Nao conclua capacidade de producao a partir dele.
